@@ -1,0 +1,53 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploader</title>
+</head>
+<body>
+    <h2>Trình tải lên</h2>
+<form id="upload_form" enctype="multipart/form-data" method="post">
+  <input type="file" multiple name="files" id="files" onchange="uploadFile()"><br>
+  <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+  <h3 id="status"></h3>
+</form>
+<script>
+function _(el) {
+  return document.getElementById(el);
+}
+
+function uploadFile() {
+  var file = _("files").files;
+  var formdata = new FormData();
+  for (var i = 0; i < file.length; i++) {
+	formdata.append("files", file[i]);
+  }
+  var ajax = new XMLHttpRequest();
+  ajax.upload.addEventListener("progress", progressHandler, false);
+  ajax.addEventListener("load", completeHandler, false);
+  ajax.addEventListener("error", errorHandler, false);
+  ajax.addEventListener("abort", abortHandler, false);
+  ajax.open("POST", "upload");
+  ajax.send(formdata);
+}
+
+function progressHandler(event) {
+  var percent = (event.loaded / event.total) * 100;
+  _("progressBar").value = Math.round(percent);
+  _("status").innerHTML = "Đang tải lên... (" + Math.round(percent) + "%)";
+}
+
+function completeHandler(event) {
+  _("status").innerHTML = event.target.responseText;
+  _("progressBar").value = 0;
+}
+
+function errorHandler(event) {
+  _("status").innerHTML = "Không thể tải lên!";
+}
+
+function abortHandler(event) {
+  _("status").innerHTML = "Đã hủy";
+}
+</script>
+</body>
